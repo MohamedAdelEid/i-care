@@ -1,0 +1,58 @@
+import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import type { AuthSession, User } from '@/domain/entities'
+import { localStorageClient } from '@/infrastructure/storage/local-storage'
+import { STORAGE_KEYS } from '@/infrastructure/storage/storage.keys'
+
+interface AuthState {
+  user: User | null
+  accessToken: string | null
+  permissions: string[]
+  isAuthenticated: boolean
+  setSession: (session: AuthSession) => void
+  updateUser: (user: User) => void
+  clearSession: () => void
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      accessToken: null,
+      permissions: [],
+      isAuthenticated: false,
+
+      setSession: (session) => {
+        localStorageClient.set(STORAGE_KEYS.authToken, session.tokens.accessToken)
+        set({
+          user: session.user,
+          accessToken: session.tokens.accessToken,
+          permissions: session.permissions,
+          isAuthenticated: true,
+        })
+      },
+
+      updateUser: (user) => set({ user }),
+
+      clearSession: () => {
+        localStorageClient.remove(STORAGE_KEYS.authToken)
+        set({
+          user: null,
+          accessToken: null,
+          permissions: [],
+          isAuthenticated: false,
+        })
+      },
+    }),
+    {
+      name: STORAGE_KEYS.authState,
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        user: state.user,
+        accessToken: state.accessToken,
+        permissions: state.permissions,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    },
+  ),
+)

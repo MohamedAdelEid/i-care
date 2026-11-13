@@ -1,0 +1,25 @@
+export const NAMESPACES = {
+  common: 'common',
+  auth: 'auth',
+  navigation: 'navigation',
+  overview: 'overview',
+  inbox: 'inbox',
+  escalations: 'escalations',
+  handoffs: 'handoffs',
+  bookings: 'bookings',
+  clinic: 'clinic',
+  customers: 'customers',
+  agents: 'agents',
+  knowledgeBase: 'knowledgeBase',
+  workflows: 'workflows',
+  tools: 'tools',
+  playground: 'playground',
+  channels: 'channels',
+  analytics: 'analytics',
+  settings: 'settings',
+  notifications: 'notifications',
+  validation: 'validation',
+  kit: 'kit',
+} as const
+
+export type Namespace = (typeof NAMESPACES)[keyof typeof NAMESPACES]
